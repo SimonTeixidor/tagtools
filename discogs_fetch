@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+import re
+import os
+import sys
+import discogs_client
+
+class colors:
+    WARNING = '\033[93m'
+    ENDC = '\033[0m'
+
+if len(sys.argv) < 2:
+	raise ValueError('Please provide release id.')
+
+def print_release(release, i):
+	artist = ', '.join([a.name for a in release.artists])
+	print(f"{colors.WARNING}Release {i}:\n\t{release.url}\n\t{release.title}\n\t{artist}{colors.ENDC}"
+	     )
+
+d = discogs_client.Client("Simon's data fetcher/0.1", user_token=os.environ['DISCOGS_TOKEN'])
+if m := re.match(r"http(s)?://www.discogs.com/.*/release/(\d+)", sys.argv[1]):
+	discogs_id = m.groups(1)[1]
+	release = d.release(discogs_id)
+else:
+	releases = d.search(' '.join(sys.argv[1:]), type='release')
+	for i,r in enumerate(releases):
+		print_release(r, i)
+	release = releases[int(input("> "))]
+
+credit_roles_dict = {
+	"PERFORMER": [
+		"sax", "guitar", "trumpet", "violin", "vocals", "wind", "tuba",
+		"trombone", "timbales", "tambourine", "synth", "vibraphone", "reeds",
+		"piano", "oud", "organ", "oboe", "percussion", "keyboard",
+		"horn", "harmonica", "flute", "drums", "congas", "clarinet",
+		"cello", "brass", "bass", "accordion", "choir", "viola", "chorus master",
+		"dulcian", "harp", "lute", "sackbut", "violone", "theorbo", "viol"
+	],
+	"ENGINEER": [ "engineer", "recorder", "mastered", "recorded" ],
+	"MIXER": [ "mixed", "mixing", "mixer" ],
+	"CONDUCTOR": [ "conductor", "conducted" ],
+	"ENSEMBLE": [ "ensemble", "orchestra" ],
+	"LYRICIST": [ "lyricist", "text by" ],
+	"ARRANGER": [ "arranged" ]
+}
+credit_roles = [(key, v) for key in credit_roles_dict for v in credit_roles_dict[key]]
+
+ignored_roles = [
+	"design", "producer", "compose", "liner", "illustration", "cover", "art direct",
+	"photo", "edited", "coordinate", "technician"
+]
+
+credits = []
+for c in release.credits:
+	if 'role' in c.data and not any(r in c.data['role'].lower() for r in ignored_roles):
+		tags = [k for k,v in credit_roles if v in c.data['role'].lower()]
+		if len(tags) == 0:
+			print(f"{colors.WARNING}WARN: Couldn't find role mapping for {c.data['role']}{colors.ENDC}")
+			continue
+		tag = tags[0]
+		if tag:
+			if tag == "PERFORMER":
+				credits.append("{}={} ({})".format(tag, c.name, c.data['role']))
+			else:
+				credits.append("{}={}".format(tag, c.name))
+print()
+for c in credits:
+	print(c)
+
+if release.genres:
+	for genre in release.genres:
+		print("GENRE={}".format(genre))
+
+if release.styles:
+	for style in release.styles:
+		print("STYLE={}".format(style))

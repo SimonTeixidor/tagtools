@@ -1,0 +1,6 @@
+#!/bin/bash
+
+TMPFILE=`mktemp /tmp/tagappend.XXXXXX`
+metaflac --export-tags-to=$TMPFILE "$1"
+vim $TMPFILE
+metaflac --remove-all-tags --import-tags-from=$TMPFILE "$1"

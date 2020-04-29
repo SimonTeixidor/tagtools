@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+TMPFILE=`mktemp /tmp/tagappend.XXXXXX`
+TAG=$1
+
+for f in "${@:2}"; do
+	echo "$(taggrep "^$TAG=" "$f")|$f"
+done > $TMPFILE
+vim $TMPFILE
+
+while read line; do
+	FILE=`echo "$line" | rev | cut -d'|' -f1 | rev`
+	TAG=`echo "$line" | rev | cut -d'|' -f2- | rev`
+	metaflac --set-tag="$TAG" "$FILE"
+done < $TMPFILE

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+function cleantags() {
+	f="$1"
+	TEMPFILE=`mktemp /tmp/tagclean.XXXXXXX`
+        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | sort -u > "$TEMPFILE"
+	grep -v '=' "$TEMPFILE" | while read line; do
+		echo "Multiline comment: $f"
+		exit 1
+	done
+	metaflac --remove-all-tags "$f"
+	metaflac --import-tags-from="$TEMPFILE" "$f"
+}
+
+for f in "$@"; do
+	cleantags "$f"
+done

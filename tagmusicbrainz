@@ -1,0 +1,24 @@
+#!/bin/bash
+
+WRITE="$1"
+
+function usage() {
+	echo "usage:"
+	echo -e "\ttagmusicbrainz WRITE [FILE]"
+}
+
+if [[ "$WRITE" != "yes" ]] && [[ "$WRITE" != "no" ]]; then
+	usage
+	exit 1
+fi
+
+for f in "${@:2}"; do
+	TRACKID=`metaflac --show-tag=MUSICBRAINZ_TRACKID "$f" | head -n 1 | cut -d= -f2-`
+	if [[ "$WRITE" == "yes" ]]; then
+		metaflac --import-tags-from=<(musicbrainzperformer.py "$TRACKID") "$f"
+	else
+		echo "$f"
+		musicbrainzperformer.py "$TRACKID"
+		echo
+	fi
+done

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+TMPFILE=`mktemp /tmp/tagappend.XXXXXX`
+vim $TMPFILE
+metaflac --import-tags-from=$TMPFILE "$@"
