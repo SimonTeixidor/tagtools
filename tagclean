@@ -5,7 +5,7 @@ set -e
 function cleantags() {
 	f="$1"
 	TEMPFILE=`mktemp /tmp/tagclean.XXXXXXX`
-        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | sort -u > "$TEMPFILE"
+        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | sort -fu > "$TEMPFILE"
 	grep -v '=' "$TEMPFILE" | while read line; do
 		echo "Multiline comment: $f"
 		exit 1

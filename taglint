@@ -31,7 +31,7 @@ for f in "$@"; do
 done
 
 for f in "$@"; do
-	metaflac --export-tags-to=- "$f" | sort | uniq -cd | while read line; do
+	metaflac --export-tags-to=- "$f" | sort | uniq -icd | while read line; do
 		echo "$f	DUPLICATE: $line"
 	done
 done
