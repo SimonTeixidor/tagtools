@@ -46,6 +46,9 @@ for relation in [r for r in recording['artist-relation-list'] if 'orchestra' in 
 for relation in [r for r in recording['artist-relation-list'] if 'conductor' in r['type']]:
 	print(f"CONDUCTOR={relation['artist']['name']}")
 
+for relation in [r for r in recording['artist-relation-list'] if 'recording' in r['type']]:
+	print(f"ENGINEER={relation['artist']['name']}")
+
 for p in (format_recording_place(recording) + format_recording_location(recording))[:1]:
 	for l in p:
 		if l != None:
