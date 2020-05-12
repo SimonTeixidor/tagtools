@@ -23,7 +23,7 @@ def format_recording_place(recording):
 	if 'place-relation-list' in recording:
 		return [[
 				format_single_place(place['place']),
-				f"RECORDINGDATE={place['end']}"
+				f"RECORDINGDATE={place['end']}" if 'end' in place else None
 			] for place in recording['place-relation-list']
 			if 'record' in place['type']]
 	return []
@@ -32,7 +32,7 @@ def format_recording_location(recording):
 	if 'area-relation-list' in recording:
 		return [[
 				f"RECORDINGLOCATION={place['area']['name']}",
-				f"RECORDINGDATE={place['end']}"
+				f"RECORDINGDATE={place['end']}" if 'end' in place else None
 			] for place in recording['area-relation-list']
 			if 'record' in place['type']]
 	return []
@@ -48,4 +48,5 @@ for relation in [r for r in recording['artist-relation-list'] if 'conductor' in 
 
 for p in (format_recording_place(recording) + format_recording_location(recording))[:1]:
 	for l in p:
-		print(l)
+		if l != None:
+			print(l)
