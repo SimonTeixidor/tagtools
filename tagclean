@@ -5,7 +5,10 @@ set -e
 function cleantags() {
 	f="$1"
 	TEMPFILE=`mktemp /tmp/tagclean.XXXXXXX`
-        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | sort -fu > "$TEMPFILE"
+        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | grep -v '^PERFORMER=' | sort -fu > "$TEMPFILE"
+	# Sort performers by their name, ignoring the role. This cleans up duplicates due to slight differences like bass/double bass.
+        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | grep '^PERFORMER=' | sort -u -t '(' -k 1,1 >> "$TEMPFILE"
+
 	grep -v '=' "$TEMPFILE" | while read line; do
 		echo "Multiline comment: $f"
 		exit 1
