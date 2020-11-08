@@ -130,3 +130,46 @@ RECORDINGDATE=1959-03-02
 ~/music/Davis, Miles/Kind of Blue> tagmusicbrainz yes *.flac
 ~/music/Davis, Miles/Kind of Blue>
 ```
+
+## tagclassical
+Interactive tool that tries to populate tags using regexes. Example:
+```
+~> tagclassical *.flac
+Tagging OPUS:
+    OPUS=D 759|01 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ I. Allegro moderato.flac
+    OPUS=D 759|02 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ II. Andante con moto.flac
+    OPUS=D 812|03 Klaviersonate C-dur, D 812 _Große Duo__ I. Allegro moderato.flac
+    OPUS=D 812|04 Klaviersonate C-dur, D 812 _Große Duo__ II. Andante.flac
+    OPUS=D 812|05 Klaviersonate C-dur, D 812 _Große Duo__ III. Scherzo - Trio.flac
+    OPUS=D 812|06 Klaviersonate C-dur, D 812 _Große Duo__ IV. Finale. Allegro moderato.flac
+(a)ccept/(e)dit
+a
+Tagging MOVEMENT:
+    MOVEMENT=I|01 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ I. Allegro moderato.flac
+    MOVEMENT=II|02 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ II. Andante con moto.flac
+    MOVEMENT=I|03 Klaviersonate C-dur, D 812 _Große Duo__ I. Allegro moderato.flac
+    MOVEMENT=II|04 Klaviersonate C-dur, D 812 _Große Duo__ II. Andante.flac
+    MOVEMENT=III|05 Klaviersonate C-dur, D 812 _Große Duo__ III. Scherzo - Trio.flac
+    MOVEMENT=IV|06 Klaviersonate C-dur, D 812 _Große Duo__ IV. Finale. Allegro moderato.flac
+(a)ccept/(e)dit
+a
+Tagging MOVEMENTNAME:
+    MOVEMENTNAME=Allegro moderato|01 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ I. Allegro moderato.flac
+    MOVEMENTNAME=Andante con moto|02 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ II. Andante con moto.flac
+    MOVEMENTNAME=Allegro moderato|03 Klaviersonate C-dur, D 812 _Große Duo__ I. Allegro moderato.flac
+    MOVEMENTNAME=Andante|04 Klaviersonate C-dur, D 812 _Große Duo__ II. Andante.flac
+    MOVEMENTNAME=Scherzo - Trio|05 Klaviersonate C-dur, D 812 _Große Duo__ III. Scherzo - Trio.flac
+    MOVEMENTNAME=Finale. Allegro moderato|06 Klaviersonate C-dur, D 812 _Große Duo__ IV. Finale. Allegro moderato.flac
+(a)ccept/(e)dit
+a
+Tagging WORK:
+    WORK=Symphonie Nr. 8 h-Moll, D 759 "Unvollendete"|01 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ I. Allegro moderato.flac
+    WORK=Symphonie Nr. 8 h-Moll, D 759 "Unvollendete"|02 Symphonie Nr. 8 h-Moll, D 759 _Unvollendete__ II. Andante con moto.flac
+    WORK=Klaviersonate C-dur, D 812 "Große Duo"|03 Klaviersonate C-dur, D 812 _Große Duo__ I. Allegro moderato.flac
+    WORK=Klaviersonate C-dur, D 812 "Große Duo"|04 Klaviersonate C-dur, D 812 _Große Duo__ II. Andante.flac
+    WORK=Klaviersonate C-dur, D 812 "Große Duo"|05 Klaviersonate C-dur, D 812 _Große Duo__ III. Scherzo - Trio.flac
+    WORK=Klaviersonate C-dur, D 812 "Große Duo"|06 Klaviersonate C-dur, D 812 _Große Duo__ IV. Finale. Allegro moderato.flac
+(a)ccept/(e)dit
+a
+~>
+```

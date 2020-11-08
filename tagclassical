@@ -1,0 +1,81 @@
+#!/bin/bash
+
+GREEN="\e[32m"
+RED="\e[31m"
+RESET="\e[0m"
+
+function transform() {
+	grep -oP "$1" | sed 's/.*/\u&/'
+}
+
+function transform_tag() {
+	FILE="$1"
+	SOURCE_TAG="$2"
+	REGEX="$3"
+	metaflac --show-tag="$SOURCE_TAG" "$FILE" | cut -d= -f2- | transform "$REGEX"
+}
+
+function write_tag() {
+	SOURCE_TAG="$1"
+	TARGET_TAG="$2"
+	REGEX="$3"
+	TMPFILE=`mktemp /tmp/tagclassical.XXXXXX`
+	for f in "${@:4}"; do
+		if metaflac --show-tag="$SOURCE_TAG" "$f" | grep --silent "$SOURCE_TAG"; then
+			if ! metaflac --show-tag="$TARGET_TAG" "$f" | grep --silent "$TARGET_TAG"; then
+				VAL=`transform_tag "$f" "$SOURCE_TAG" "$REGEX"`
+				if [[ "$VAL" != "" ]]; then
+					echo "$TARGET_TAG=$VAL|$f" >> "$TMPFILE"
+				fi
+			fi
+		fi
+	done
+	LINES=`wc -l "$TMPFILE" | cut -d' ' -f1`
+	if [ $LINES -ne 0 ]; then
+		echo -e "${GREEN}Tagging $TARGET_TAG:$RESET"
+		sed 's/^/    /g' <"$TMPFILE"
+		echo "(a)ccept/(e)dit"
+		while read l; do
+			[[ "$l" == "a" ]] && break
+			if [[ "$l" == "e" ]]; then
+				vim "$TMPFILE"
+				break
+			fi
+			echo "(a)ccept/(e)dit"
+		done
+		while read line; do
+			FILE=`echo "$line" | rev | cut -d'|' -f1 | rev`
+			TAG=`echo "$line" | rev | cut -d'|' -f2- | rev`
+			metaflac --set-tag="$TAG" "$FILE"
+		done < $TMPFILE
+	fi
+}
+
+function test_regex() {
+	SOURCE="$1"
+	EXPECTED="$2"
+	REGEX="$3"
+	RESULT=`transform "$REGEX"<<<"$SOURCE"`
+	if [[ "$RESULT" != "$EXPECTED" ]]; then
+		echo -e "${RED}Found \"$RESULT\", expected \"$EXPECTED\", for \"$SOURCE$RESET\""
+	fi
+}
+
+OPUS_REGEX="(Wq|Op|S|BWV|M|L|D|WAB|AV|HWV|RV|op)+\.? [0-9]+"
+MOVEMENT_REGEX=": \K(I|V)+"
+MOVEMENTNAME_REGEX=": (I|V)+\.? \K.*"
+WORK_REGEX=".*(?=:)"
+
+if [[ "$1" != "test" ]]; then
+	write_tag TITLE OPUS  "$OPUS_REGEX" "${@:1}"
+	write_tag TITLE MOVEMENT "$MOVEMENT_REGEX" "${@:1}"
+	write_tag TITLE MOVEMENTNAME "$MOVEMENTNAME_REGEX" "${@:1}"
+	write_tag TITLE WORK "$WORK_REGEX" "${@:1}"
+else
+	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Wq. 172" "$OPUS_REGEX"
+	test_regex "Concerto in A major, Wq. 172: I. Allegro" "I" "$MOVEMENT_REGEX"
+	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Allegro" "$MOVEMENTNAME_REGEX"
+	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Concerto in A major, Wq. 172" "$WORK_REGEX"
+	test_regex "Concerto for Violin and Orchestra in D major, op. 61: I. Allegro, ma non troppo" "Op. 61" "$OPUS_REGEX"
+	test_regex "Serenade for Solo Violin, Strings, Harp and Percussion: I. Phaedrus. Pausanius (Lento - Allegro)" "Serenade for Solo Violin, Strings, Harp and Percussion" "$WORK_REGEX"
+fi
