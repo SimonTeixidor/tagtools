@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+TMPFILE=`mktemp /tmp/tagremove.XXXXXX`
+WRITE=$1
+FROM=$2
+TO=$3
+
+if [[ "$WRITE" != "yes" ]] && [[ "$WRITE" != "no" ]]; then
+	echo "Arg 1 must be yes or no"
+	exit 1
+fi
+
+for f in "${@:4}"; do
+	metaflac --export-tags-to=$TMPFILE "$f"
+	
+	if [[ "$WRITE" == "yes" ]]; then
+		metaflac --show-tag="$FROM" "$f" > "$TMPFILE"
+		metaflac --remove-tag="$FROM" "$f"
+		metaflac --import-tags-from=<(sed "s/$FROM/$TO/" < "$TMPFILE") "$f"
+	else
+		grep "$FROM" $TMPFILE | while read line; do
+			echo changing "$line" to $(echo "$line" | sed "s/$FROM/$TO/")
+		done
+	fi
+done
