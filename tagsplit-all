@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for tag in composer artist genre performer conductor; do
+	(mpc search "$tag" ','; mpc search "$tag" '/'; mpc search "$tag" ';') |
+	while read file; do
+		tagsplit yes "$tag" /mnt/storage/music/"$file"
+	done
+done
