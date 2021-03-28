@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+TMPFILE=`mktemp /tmp/tagremove.XXXXXX`
+WRITE=$1
+TAG=${2^^}
+
+if [[ "$WRITE" != "yes" ]] && [[ "$WRITE" != "no" ]]; then
+	echo "Arg 1 must be yes or no"
+	exit 1
+fi
+
+function split() {
+	cut -d= -f2- | tr ',' '\n' | tr '/' '\n' | tr ';' '\n' | sed 's/^ *//;s/ *$//' | sed "s/^/$TAG=/"
+}
+
+for f in "${@:3}"; do
+	metaflac --show-tag="$TAG" "$f" > $TMPFILE
+	
+	if [[ "$WRITE" == "yes" ]]; then
+		metaflac --remove-tag="$TAG" "$f"
+		metaflac --import-tags-from=<(split <$TMPFILE) "$f"
+	else
+		echo splitting $(cat $TMPFILE)
+		split < $TMPFILE | while read line; do
+			echo "$line"
+		done
+	fi
+done
