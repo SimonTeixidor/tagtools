@@ -2,10 +2,19 @@
 
 set -e
 
+# These are duplicate tags introduced by beets.
+TAGS_TO_REMOVE='^(ALBUM ARTIST|ALBUMARTISTCREDIT|ALBUMARTIST_CREDIT|ARTIST_CREDIT|PUBLISHER|YEAR|DISCNUMBER|DISCC|[^=]* [^=]*=|TOTALTRACKS|TRACKC|TRACKNUMBER|TOTALDISCS|BPM|ASIN)'
+
 function cleantags() {
 	f="$1"
 	TEMPFILE=`mktemp /tmp/tagclean.XXXXXXX`
-        metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | grep -v '^PERFORMER=' | sort -fu > "$TEMPFILE"
+	# Remove duplicates
+        metaflac --export-tags-to=- "$f" |
+		awk -F= '{printf "%s=%s\n", toupper($1),$2 }' | # uppercase tags
+		grep -v '[^=]*=\s*$' |
+		grep -v '^PERFORMER=' | # performer is handled later
+		grep -Ev "$TAGS_TO_REMOVE" | # remove unwanted tags
+		sort -fu > "$TEMPFILE"
 	# Sort performers by their name, ignoring the role. This cleans up duplicates due to slight differences like bass/double bass.
         metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | grep '^PERFORMER=' | sort -u -t '(' -k 1,1 >> "$TEMPFILE"
 
