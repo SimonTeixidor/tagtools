@@ -16,8 +16,8 @@ def format_relation(rel):
 
 def format_single_place(place):
 	if 'address' in place:
-		return f"RECORDINGLOCATION={place['name']}, {place['address']}"
-	return f"RECORDINGLOCATION={place['name']}"
+		return f"LOCATION={place['name']}, {place['address']}"
+	return f"LOCATION={place['name']}"
 
 def format_recording_place(recording):
 	if 'place-relation-list' in recording:
@@ -31,7 +31,7 @@ def format_recording_place(recording):
 def format_recording_location(recording):
 	if 'area-relation-list' in recording:
 		return [[
-				f"RECORDINGLOCATION={place['area']['name']}",
+				f"LOCATION={place['area']['name']}",
 				f"RECORDINGDATE={place['end']}" if 'end' in place else None
 			] for place in recording['area-relation-list']
 			if 'record' in place['type']]
