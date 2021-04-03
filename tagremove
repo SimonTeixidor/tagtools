@@ -15,9 +15,10 @@ for f in "${@:3}"; do
 	metaflac --export-tags-to=$TMPFILE "$f"
 	
 	if [[ "$WRITE" == "yes" ]]; then
-		metaflac --remove-tag="$TAG" "$f"
+		metaflac --remove-all-tags "$f"
+		metaflac --import-tags-from=<(grep -v "$TAG" $TMPFILE) "$f"
 	else
-		grep "^$TAG=" $TMPFILE | while read line; do
+		grep "$TAG" $TMPFILE | while read line; do
 			echo Removing "$line"
 		done
 	fi
