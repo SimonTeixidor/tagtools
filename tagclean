@@ -14,6 +14,7 @@ function cleantags() {
 		grep -v '[^=]*=\s*$' |
 		grep -v '^PERFORMER=' | # performer is handled later
 		grep -Ev "$TAGS_TO_REMOVE" | # remove unwanted tags
+		grep -v '[^=]*=$' | # remove empty tags
 		sort -fu > "$TEMPFILE"
 	# Sort performers by their name, ignoring the role. This cleans up duplicates due to slight differences like bass/double bass.
         metaflac --export-tags-to=- "$f" | grep -v '[^=]*=\s*$' | grep '^PERFORMER=' | sort -u -t '(' -k 1,1 >> "$TEMPFILE"
