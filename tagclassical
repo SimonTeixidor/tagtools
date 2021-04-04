@@ -33,7 +33,9 @@ function write_tag() {
 	LINES=`wc -l "$TMPFILE" | cut -d' ' -f1`
 	if [ $LINES -ne 0 ]; then
 		echo -e "${GREEN}Tagging $TARGET_TAG:$RESET"
-		sed 's/^/    /g' <"$TMPFILE"
+		while IFS='|' read tag file; do
+			echo -e "\e[1m$tag\e[0m	$file"
+		done <"$TMPFILE"
 		echo "(a)ccept/(e)dit"
 		while read l; do
 			[[ "$l" == "a" ]] && break
