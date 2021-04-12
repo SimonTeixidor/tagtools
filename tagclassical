@@ -64,8 +64,8 @@ function test_regex() {
 }
 
 OPUS_REGEX="(Wq|Op|S|BWV|M|L|D|WAB|AV|HWV|RV|op)+\.? [0-9]+"
-MOVEMENT_REGEX=": \K(I|V)+"
-MOVEMENTNAME_REGEX=": (I|V)+\.? \K.*"
+MOVEMENT_REGEX="(:|-) \K(I|V)+"
+MOVEMENTNAME_REGEX="(:|-) (I|V)+\.? \K.*"
 WORK_REGEX=".*(?=:)"
 
 if [[ "$1" != "test" ]]; then
@@ -77,6 +77,8 @@ else
 	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Wq. 172" "$OPUS_REGEX"
 	test_regex "Concerto in A major, Wq. 172: I. Allegro" "I" "$MOVEMENT_REGEX"
 	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Allegro" "$MOVEMENTNAME_REGEX"
+	test_regex "Trio no. 1 op. 49 - I. Moto allegro agitato" "I" "$MOVEMENT_REGEX"
+	test_regex "Trio no. 1 op. 49 - I. Moto allegro agitato" "Moto allegro agitato" "$MOVEMENTNAME_REGEX"
 	test_regex "Concerto in A major, Wq. 172: I. Allegro" "Concerto in A major, Wq. 172" "$WORK_REGEX"
 	test_regex "Concerto for Violin and Orchestra in D major, op. 61: I. Allegro, ma non troppo" "Op. 61" "$OPUS_REGEX"
 	test_regex "Serenade for Solo Violin, Strings, Harp and Percussion: I. Phaedrus. Pausanius (Lento - Allegro)" "Serenade for Solo Violin, Strings, Harp and Percussion" "$WORK_REGEX"
