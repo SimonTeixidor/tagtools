@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TAG="$1"
+FROM="$2"
+
+mpc search "($TAG == \"$FROM\")" | while read line; do
+	tagremove yes "$TAG=$FROM" /mnt/storage/music/"$line"
+done
