@@ -13,7 +13,7 @@ function cleantags() {
 		awk -F= '{printf "%s=%s\n", toupper($1),$2 }' | # uppercase tags
 		grep -v '[^=]*=\s*$' |
 		grep -v '^PERFORMER=' | # performer is handled later
-		grep -Ev "$TAGS_TO_REMOVE" | # remove unwanted tags
+		grep -Ev "^$TAGS_TO_REMOVE=" | # remove unwanted tags
 		grep -v '[^=]*=$' | # remove empty tags
 		sort -fu > "$TEMPFILE"
 	# Sort performers by their name, ignoring the role. This cleans up duplicates due to slight differences like bass/double bass.

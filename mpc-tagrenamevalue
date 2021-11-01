@@ -4,6 +4,7 @@ TAG="$1"
 FROM="$2"
 TO="$3"
 
-mpc search "$TAG" "$FROM" | while read line; do
+mpc search "($TAG == \"$FROM\")" | while read line; do
 	tagrenamevalue yes "$TAG" "$FROM" "$TO" /mnt/storage/music/"$line"
+	tagclean /mnt/storage/music/"$line"
 done
